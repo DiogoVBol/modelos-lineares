@@ -1,0 +1,185 @@
+---
+title: "ATIVIDADE 6 MODELOS LINEARES"
+output: html_document
+date: "2024-12-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### aLUNOS: DIOGO, THIAGO, DAVI, JOÃO AREND E LUAN
+
+
+## 1- 
+
+## 2-
+
+## 3- 
+
+### a) Estime e interprete os coeficientes do modelo de regressao.
+
+```{r}
+n <- 10
+soma_y <- 20
+soma_x1 <- 30
+soma_x2 <- 40
+soma_y2 <- 88.2
+soma_x1_squared <- 92
+soma_x2_squared <- 163
+soma_yx1 <- 59
+soma_yx2 <- 88
+soma_x1x2 <- 119
+
+# Matriz X'X
+XTX <- matrix(c(
+  n, soma_x1, soma_x2,
+  soma_x1, soma_x1_squared, soma_x1x2,
+  soma_x2, soma_x1x2, soma_x2_squared
+), nrow = 3, byrow = TRUE)
+
+# Vetor X'Y
+XTY <- c(soma_y, soma_yx1, soma_yx2)
+
+beta <- solve(XTX) %*% XTY
+beta
+# Beta_{0} = -13
+# Beta_{1} = 1
+# Beta_{2} = 3
+```
+Interpretação:
+
+**Intercepto ($B_{0})$**: Representa o valor esperado de $Y$ (-13) quando $X_{1}$ e $X_{2}$ é zero.
+
+**Coeficiente de $X_{1}$ ($B_{1}$)**: Indica a variação em $Y$ para cada unidade de aumento em $X_{1}$, mantendo $X_{2}$ constante.
+
+**Intercepto ($B_{0})$**: Representa o valor esperado de $Y$ (-13) quando $X_{1}$ e $X_{2}$ é zero.
+
+**Coeficiente de $X_{2}$ ($B_{2}$)**: Indica a variação em $Y$ para cada unidade de aumento em $X_{2}$, mantendo $X_{1}$ constante.
+
+### b) Calcule e interprete o coeficiente de determinação ajustado
+
+$$
+R_{ajustado}^{2}=1-\frac{(1-R^{2})(n-1)}{n-k-1}
+$$
+Onde:
+
+- $R^{2}$: Coeficiente de determinação comum.
+
+- $n$: Número de observações.
+
+- $k$: Número de variáveis independentes.
+
+````{r}
+media_y <- soma_y / n
+X <- matrix(c(rep(1, n), soma_x1 / n, soma_x2 / n), ncol = 3, byrow = TRUE)
+Y_hat <- X %*% beta
+# Calcular o R primeiro
+
+## Soma de quadrados total 
+SQtotal <- soma_y2 - n * (media_y^2)
+
+## Soma de quadrados dos resíduos 
+SQres <- soma_y2 - sum(Y_hat^2)
+
+## Soma de quadrados da regressão 
+SQreg <- SQtotal - SQres
+
+# Coeficiente de determinação (R^2)
+R2 <- SQreg / SQtotal
+
+# Coeficiente de determinação ajustado (R^2 ajustado)
+R2_ajustado <- 1 - ((1 - R2) * (n - 1) / (n - 3))
+
+R2_ajustado
+````
+Interpretação:
+
+- $R^{2}:$ Mede a proporçaõ de variação total de $Y$ explicada pelas variáveis $X_{1}$ e $X_{2}$.
+- $R_{ajustado}^{2}:$ Ajuda o $R^{2}$ para o número de variáveis independentes do modelo, penalizando a inclusão de variáveis irrelevantes.
+
+### c) Calcule e interprete o intervalode 95% de confoança para o coeficiente angular de X1.
+
+````{R}
+# Soma de quadrados dos resíduos 
+SQres <- soma_y2 - t(beta) %*% XTY
+
+sigma2 <- as.numeric(SQres / (n - 3))
+
+# Erro padrão do coeficiente de X1
+SE_beta1 <- sqrt(sigma2 * solve(XTX)[2, 2])
+
+t_critico <- qt(0.975, df = n - 3)
+
+# Intervalo de confiança para o coeficiente de X1
+beta1 <- beta[2]
+IC_beta1 <- c(
+  beta1 - t_critico * SE_beta1,
+  beta1 + t_critico * SE_beta1
+)
+
+IC_beta1
+````
+O intervalo de confiança para o coeficiente $X_{1}$ é de [-2.47,4.47] e indica o intervalo dentro do qual o real coeficiente está presente com 95% de certeza.
+O intervalo contém o zero, e portanto o coeficiente não é estatisticamente significativo, inficando que $X_{1}$ não tem um efeito relevante sobre o $Y$.
+
+### d) Teste a hipotese de que X2 exerce influencia linear sobre Y, a 5% de nível de significancia.
+
+````{r}
+sigma2 <- as.numeric(SQres / (n - 3)) 
+
+# Erro padrão do coeficiente de X2
+SE_beta2 <- sqrt(sigma2 * solve(XTX)[3, 3])
+
+# Estatística t para X2
+beta2 <- beta[3] 
+t_stat <- beta2 / SE_beta2
+
+# Valor crítico de t para 95% de confiança (nível de significância 5%)
+t_critico <- qt(0.975, df = n - 3)
+
+p_valor <- 2 * (1 - pt(abs(t_stat), df = n - 3))
+
+list(
+  Estatistica_t = t_stat,
+  Valor_critico = t_critico,
+  p_valor = p_valor
+)
+
+````
+Interpretação:
+
+Como o valor de p é menor que 0.05, há evidencias para concluir que podemos rejeitar $H_{0}$ indicando que $X_{2}$ tem influência linear significativa.
+
+### e) Teste a significancia global da regressao, a 5% de nível de significancia. Especifique as hipóteses e interprete.
+
+````{R}
+k <- 2 
+df_reg <- 2
+df_res <- n - 3
+
+# Estatística F
+F_stat <- (SQreg / df_reg) / (SQres / df_res)
+
+# Valor crítico de F
+F_critico <- qf(0.95, df1 = df_reg, df2 = df_res)
+
+p_valor <- 1 - pf(F_stat, df1 = df_reg, df2 = df_res)
+
+list(
+  Estatistica_F = F_stat,
+  Valor_critico = F_critico,
+  p_valor = p_valor
+)
+
+````
+
+Interpretação:
+
+Como o valor de p é menor que 0.05, há evidencias para rejeitar $H_{0}$, indicando que o modelo é significativo.
+
+## 4- 
+
+## 5-
+
+## 6- 
