@@ -1,21 +1,23 @@
 ---
-title: "ATIVIDADE 6 MODELOS LINEARES"
+title: "Atividade 6 - Modelos Lineares"
 output: html_document
-date: "2024-12-08"
 ---
 
 ```{r setup, include=FALSE}
+
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
 ```
 
-### aLUNOS: DIOGO, THIAGO, DAVI, JOÃO AREND E LUAN
+### Alunos: Davi Augusto, Diogo Bolzan, João Arend, Luan Frederico e Thiago Schedler.
 
 
-## 1- 
+## 1
 
-## 2-
+## 2
 
-## 3- 
+## 3
 
 ### a) Estime e interprete os coeficientes do modelo de regressao.
 
@@ -76,13 +78,13 @@ X <- matrix(c(rep(1, n), soma_x1 / n, soma_x2 / n), ncol = 3, byrow = TRUE)
 Y_hat <- X %*% beta
 # Calcular o R primeiro
 
-## Soma de quadrados total 
+## Soma de quadrados total
 SQtotal <- soma_y2 - n * (media_y^2)
 
-## Soma de quadrados dos resíduos 
+## Soma de quadrados dos resíduos
 SQres <- soma_y2 - sum(Y_hat^2)
 
-## Soma de quadrados da regressão 
+## Soma de quadrados da regressão
 SQreg <- SQtotal - SQres
 
 # Coeficiente de determinação (R^2)
@@ -101,7 +103,7 @@ Interpretação:
 ### c) Calcule e interprete o intervalode 95% de confoança para o coeficiente angular de X1.
 
 ````{R}
-# Soma de quadrados dos resíduos 
+# Soma de quadrados dos resíduos
 SQres <- soma_y2 - t(beta) %*% XTY
 
 sigma2 <- as.numeric(SQres / (n - 3))
@@ -126,13 +128,13 @@ O intervalo contém o zero, e portanto o coeficiente não é estatisticamente si
 ### d) Teste a hipotese de que X2 exerce influencia linear sobre Y, a 5% de nível de significancia.
 
 ````{r}
-sigma2 <- as.numeric(SQres / (n - 3)) 
+sigma2 <- as.numeric(SQres / (n - 3))
 
 # Erro padrão do coeficiente de X2
 SE_beta2 <- sqrt(sigma2 * solve(XTX)[3, 3])
 
 # Estatística t para X2
-beta2 <- beta[3] 
+beta2 <- beta[3]
 t_stat <- beta2 / SE_beta2
 
 # Valor crítico de t para 95% de confiança (nível de significância 5%)
@@ -154,7 +156,7 @@ Como o valor de p é menor que 0.05, há evidencias para concluir que podemos re
 ### e) Teste a significancia global da regressao, a 5% de nível de significancia. Especifique as hipóteses e interprete.
 
 ````{R}
-k <- 2 
+k <- 2
 df_reg <- 2
 df_res <- n - 3
 
@@ -178,8 +180,62 @@ Interpretação:
 
 Como o valor de p é menor que 0.05, há evidencias para rejeitar $H_{0}$, indicando que o modelo é significativo.
 
-## 4- 
+## 4
+Dada a amostra abaixo, calcule.
+Y X1 X2
+5 1 1
+6 2 1
+7 3 2
+8 4 2
+8 5 2
+```{r, include=FALSE}
 
-## 5-
+y  = c(5, 6, 7, 8, 8)
+x1 = c(1, 2, 3, 4, 5)
+x2 = c(1, 1, 2, 2, 2)
 
-## 6- 
+dados <- data.frame(
+  Y  = y,
+  X1 = x1,
+  X2 = x2)
+```
+### a: Construa um intervalo de 90% de confiança para os parâmetros do modelo.
+```{r 4a}
+
+modelo <- lm(Y ~ X1 + X2, data = dados)
+
+cat("Intervalo de confiança de 90% para os parâmetros:\n")
+confint(modelo, level = 0.90)
+```
+### b: Qual a equação de regressão estimada?
+```{r 4b}
+
+coeficientes <- coef(modelo)
+
+cat("Equação de regressão estimada:\n")
+cat(sprintf("Y = %.2f + %.2f*X1 + %.2f*X2\n", coeficientes[1], coeficientes[2], coeficientes[3]))
+```
+### c: Construa a tabela ANOVA, qual a sua conclusão?
+```{r 4c}
+
+cat("Tabela anova:\n")
+anova(modelo)
+```
+### d: Calcule e interprete os coeficientes de determinação parciais de Y X1.X2 e Y X2.X21
+```{r 4d}
+library(ppcor)
+ry1_2 = pcor.test(y, x1, x2)
+ry1_2
+(ry1_2$estimate)^2
+
+ry2_1 = pcor.test(y, x2, x1)
+ry2_1
+
+(ry2_1$estimate)^2
+```
+Portanto `r (ry1_2$estimate)^2 * 100`% da variabilidade de Y é explicada por X1 mantendo X2 constante e `r (ry2_1$estimate)^2 * 100`% da variabilidade de Y é explicada por X2 mantendo X1 constante.
+**obs:** Os valores estimados para coeficiente de correlação parcial não foram significativos.
+
+## 5
+
+## 6
