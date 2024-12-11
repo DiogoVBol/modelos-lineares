@@ -226,6 +226,9 @@ cat(sprintf("Y = %.2f + %.2f*X1 + %.2f*X2\n", coeficientes[1], coeficientes[2], 
 cat("Tabela anova:\n")
 anova(modelo)
 ```
+
+Atráves da análise da ANOVA podemos notar que apenas uma variável exerce efeito sobre o modelo ($X_{1}$) enquanto a ($X_{2}$) não tem influência significativa.
+
 ### d: Calcule e interprete os coeficientes de determinação parciais de Y X1.X2 e Y X2.X21
 ```{r 4d}
 library(ppcor)
