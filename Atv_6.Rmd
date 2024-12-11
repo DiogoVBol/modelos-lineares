@@ -13,11 +13,16 @@ knitr::opts_chunk$set(message = FALSE)
 ### Alunos: Davi Augusto, Diogo Bolzan, João Arend, Luan Frederico e Thiago Schedler.
 
 
-## 1
+## Questão 1
 
-## 2
+![=](img/01.jpeg)
+![=](img/02.jpeg)
 
-## 3
+## Questão 2
+
+![=](img/03.jpeg)
+
+## Questão 3
 
 ### a) Estime e interprete os coeficientes do modelo de regressao.
 
@@ -180,7 +185,7 @@ Interpretação:
 
 Como o valor de p é menor que 0.05, há evidencias para rejeitar $H_{0}$, indicando que o modelo é significativo.
 
-## 4
+## Questão 4
 Dada a amostra abaixo, calcule.
 Y X1 X2
 5 1 1
@@ -236,6 +241,180 @@ ry2_1
 Portanto `r (ry1_2$estimate)^2 * 100`% da variabilidade de Y é explicada por X1 mantendo X2 constante e `r (ry2_1$estimate)^2 * 100`% da variabilidade de Y é explicada por X2 mantendo X1 constante.
 **obs:** Os valores estimados para coeficiente de correlação parcial não foram significativos.
 
-## 5
+## Questão 5
 
-## 6
+# Esboce graficamente o modelo estimado
+```{r}
+library(gridExtra)
+library(ggplot2)
+
+# Configuração do modelo
+beta0 <- 1000
+beta1 <- 500
+alpha1 <- 0.9
+
+X <- seq(0, 20, by = 0.01)
+
+# Calcular Y para Z = 0 e Z = 1
+Y_Z0 <- beta0 + beta1 * X + (alpha1 * 0)
+Y_Z1 <- beta0 + beta1 * X + (alpha1 * 1)
+
+
+# Criar o gráfico
+z0 = ggplot()+
+  geom_line(aes(X,Y_Z0),color = "blue") +
+  labs( x = "Tempo de serviço",
+        y = "Salário",
+        title =  "Para Z = 0") +
+  theme_minimal()
+
+
+
+z1 = ggplot()+
+  geom_line(aes(X,Y_Z1),color = "red") +
+  labs( x = "Tempo de serviço",
+        y = "Salário",
+        title =  "Para Z = 1") +
+  theme_minimal()
+
+grid.arrange(z0,z1,nrow=1,ncol= 2)
+```
+
+
+# Interprete o valor do coeficiente da variável Z
+
+  Espera-se que indivíduos com nível superior tenham, em média, um salário 0.9 unidades monetárias maior em comparação com aqueles sem nível superior. Embora positivo, o impacto da escolaridade no salário é relativamente pequeno em relação ao efeito do tempo de serviço, não sendo possível visualizar essa diferença nos gráficos acima.
+  
+  
+# Teste, a 5% de significância, se existe influência do nível educacional no salário.
+
+```{r}
+beta_Z <- 0.9
+se_beta_Z <- 0.1
+n <- 20
+
+t_stat <- beta_Z / se_beta_Z
+
+df <- n - 2
+
+t_crit <- qt(0.975, df)
+
+p_value <- 2 * (1 - pt(abs(t_stat), df))
+
+cat("Valor-p:", p_value, "\n")
+
+```
+
+  Como o p-valor foi significativo, há evidências de que o nível educacional (variável Z) influencia o salário. No entanto, é importante observar que a magnitude dessa influência é pequena, com uma diferença salarial de apenas 0.9 unidades monetárias entre indivíduos com e sem nível superior. Isso sugere que, embora o nível educacional tenha um efeito estatisticamente significativo no salário, esse impacto é relativamente modesto em comparação com outras variáveis, como o tempo de serviço.
+
+## Questão 6
+
+Considere o seguinte modelo estimado para explicar salários via nível educacional e experiência
+profissional:
+
+$$
+\widehat{\log(\text{salários})} = 7,42 + 0,29 \cdot \text{grad} + 0,04 \cdot \text{exper}
+$$
+
+em que:
+
+- \(\text{grad} = 1\) se possui curso superior, e \(0\) caso contrário;
+- \(\text{exper}\) são os anos de experiência profissional.
+
+Além disso, os valores de ajuste do modelo são:
+
+- \(R^2 = 0,2731\),
+- \(R^2_{\text{ajustado}} = 0,152\),
+- \(n = 15\).
+
+### a) Interprete os coecientes estimados neste modelo.
+
+**Interpretação de $\beta_0$**: O intercepto (\(\beta_0\)) é o coeficiente \(7,42\), que representa o valor esperado do logaritmo do salário (\(\log(\text{salários})\)) para indivíduos sem curso superior (\(\text{grad} = 0\)) e sem experiência profissional (\(\text{exper} = 0\)), que ocorre quando as variáveis **grad** e **exper** são iguais a zero. 
+Como o modelo está em escala de logaritmos, \(\beta_0\) não representa diretamente o salário, mas sim o logaritmo do salário. Para interpretar em termos de salário, é necessário calcular \(e^{\beta_0}\), que forneceria o salário esperado.  
+
+**Interpretação de $\beta_1$**: O coeficiente \(0,29\) significa que, mantendo-se constante a experiência profissional (\(\text{exper}\)),
+ter curso superior (\(\text{grad} = 1\)) está associado a um aumento médio de \(29\%\) no salário em relação a não ter curso superior (\(\text{grad} = 0\)).
+
+Essa interpretação decorre da propriedade exponencial dos logaritmos:
+
+\[
+\Delta \log(\text{salários}) = 0,29 \implies \Delta \text{salários} \approx e^{0,29} - 1 \approx 0,29 \, \text{(ou 29\%)}.
+\]
+
+**Interpretação de $\beta_2$**: O coeficiente \(0,04\) significa que, mantendo-se constante o nível educacional (\(\text{grad}\)), cada ano adicional
+de experiência profissional está associado a um aumento médio de \(4\%\) no salário.
+
+Assim como no caso anterior, isso pode ser interpretado usando a relação exponencial:
+
+\[
+\Delta \log(\text{salários}) = 0,04 \implies \Delta \text{salários} \approx e^{0,04} - 1 \approx 0,04 \, \text{(ou 4\%)}.
+\]  
+
+### b) Esboce o gráfico de log do salário em função da experiência profissional para pessoas com graduação e sem graduação.
+
+```{r}
+# Criando os dados
+exper = seq(0, 40, by = 1) # de 0 a 40 anos de experiência
+log_salario_sem_grad = 7.42 + 0.04 * exper
+log_salario_com_grad = 7.42 + 0.29 + 0.04 * exper
+
+# Criando um data frame para o ggplot
+dados = data.frame(
+  Experiencia = rep(exper, 2),
+  LogSalario = c(log_salario_sem_grad, log_salario_com_grad),
+  Graduacao = rep(c("Sem Graduação", "Com Graduação"), each = length(exper))
+)
+
+# Gerando o gráfico
+ggplot(dados, aes(x = Experiencia, y = LogSalario, color = Graduacao)) +
+  geom_line(size = 1.2) +
+  labs(
+    title = "Log do salário em função da experiência profissional",
+    x = "Experiência Profissional (anos)",
+    y = expression(log(salários)),
+    color = "Graduação"
+  ) +
+  theme_minimal() +
+  scale_color_manual(values = c("blue", "red"))
+```
+
+### c) Proponha um modelo que considere diferentes inclinações na reta de regressão para graduados e não graduados.
+
+\[
+\text{log(salário)} = \beta_0 + \beta_1 \cdot \text{exper} + \beta_2 \cdot \text{grad} + \beta_3 \cdot (\text{exper} \cdot \text{grad})
+\]
+
+Para encontar o modelo acima, não há algum cálculo específico para encontrá-la, mas sim uma fundamentação baseada em teorias estatísticas.  
+
+Com base neste modelo, podemos encontrar os modelos para as pessoas com graduação e sem graduação, segue que:
+
+Para não graduados (\( \text{grad} = 0 \)): Substituímos \( \text{grad} = 0 \) na equação,o modelo fica assim:
+\[
+\text{log(salário)} = \beta_0 + \beta_1 \cdot \text{exper}
+\]
+
+Aqui, a inclinação em relação à experiência é apenas \( \beta_1 \).  
+
+Para graduados (\( \text{grad} = 1 \)): Substituímos \( \text{grad} = 1 \) na equação:
+\[
+\text{log(salário)} = \beta_0 + \beta_1 \cdot \text{exper} + \beta_2 + \beta_3 \cdot \text{exper}
+\]
+
+Aqui, a inclinação em relação à experiência é \( \beta_1 + \beta_3 \).
+
+Em que O termo $\beta_3$ representa a diferença na inclinação da relação entre experiência e log do salário entre graduados e não graduados.  
+
+### d) Qual seria a hipótese nula para testar se há diferença nas inclinações entre graduados e não graduados no modelo do item anterior? 
+
+A hipótese nula para testar se há diferença nas inclinações entre graduados e não graduados no modelo do item anterior, que inclui o termo de interação,
+seria testar se o coeficiente de interação ($\beta_3$) é igual a zero. Assim, as hipóteses seriam:
+$$ H_0: \beta_3 = 0 \quad vs \quad H_1: \beta_3 \neq 0$$  
+
+- Se $\beta_3 = 0$, isso indica que não há diferença na inclinação entre graduados e não graduados.
+Ou seja, a relação entre experiência e salário seria a mesma para os dois grupos.
+
+- Se $\beta_3 \neq 0$, isso indica que há uma diferença significativa nas inclinações entre os dois grupos.
+Ou seja, a relação entre experiência e salário difere para graduados e não graduados.
+
+Esta hipótese pode ser calculada através de um teste t para o coeficiente $\beta_3$ no modelo ajustado.
+
